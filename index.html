@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dizionario Romagnolo</title>
+<meta name="description" content="Il portale dei dizionari del romagnolo: dizionario poetico italiano–romagnolo, rime, inglese–romagnolo, Enrico Berti.">
+<meta property="og:title" content="Dizionario Romagnolo">
+<meta property="og:description" content="Dizionari e strumenti per la lingua romagnola, dal corpus dei poeti tra Cesena e Santarcangelo.">
+<meta property="og:locale" content="it_IT">
+<meta name="theme-color" content="#8F432A">
+<style>
+:root{
+  --tela:#EFE7D6; --tela-scura:#E4D9C2; --ruggine:#8F432A; --ruggine-scura:#6E3220; --verderame:#4A6653;
+  --inchiostro:#2B241B; --lieve:#6B5F4D; --carta:#F7F2E6; --oro:#B98A3D;
+  --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+  --sans:'Gill Sans','Gill Sans MT',Seravek,'Trebuchet MS',Verdana,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--tela);color:var(--inchiostro);font-family:var(--serif);min-height:100vh;
+  background-image:radial-gradient(rgba(139,110,70,.05) 1px,transparent 1px);background-size:7px 7px}
+a{color:inherit;text-decoration:none}
+a:focus-visible{outline:3px solid var(--oro);outline-offset:3px}
+.stampa{height:34px;background:var(--ruggine);overflow:hidden}
+.stampa svg{display:block;height:34px;width:100%}
+header{max-width:900px;margin:0 auto;padding:2.6rem 1.2rem 1rem;text-align:center}
+h1{font-size:clamp(1.9rem,6vw,3rem);font-weight:600;color:var(--ruggine-scura);letter-spacing:.01em}
+.motto{font-style:italic;color:var(--lieve);margin-top:.6rem;font-size:1.05rem}
+main{max-width:900px;margin:0 auto;padding:0 1.2rem 3rem}
+
+/* scheda principale */
+.principale{display:flex;gap:1.4rem;align-items:center;background:var(--carta);border:2px solid var(--ruggine);
+  box-shadow:6px 6px 0 rgba(143,67,42,.2);padding:1.8rem;margin-top:1.6rem;transition:transform .15s,box-shadow .15s}
+.principale:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 rgba(143,67,42,.25)}
+.principale .ico{flex:none;width:96px;height:96px}
+.principale h2{font-size:clamp(1.35rem,4vw,1.9rem);color:var(--ruggine-scura);font-weight:600}
+.principale p{margin-top:.5rem;font-size:1.08rem;line-height:1.5}
+.vai{display:inline-block;margin-top:.9rem;font-family:var(--sans);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--ruggine);color:var(--carta);padding:.55rem 1.1rem}
+
+.sezione{font-family:var(--sans);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--lieve);
+  text-align:center;margin:2.6rem 0 1rem}
+.griglia{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}
+.scheda{display:flex;flex-direction:column;background:var(--carta);border:1px solid var(--tela-scura);
+  border-top:4px solid var(--verderame);padding:1.3rem;transition:transform .15s,border-color .15s}
+.scheda:hover{transform:translateY(-3px);border-top-color:var(--ruggine)}
+.scheda .ico{width:56px;height:56px;margin-bottom:.8rem}
+.scheda h3{font-size:1.2rem;color:var(--ruggine-scura);font-weight:600}
+.scheda p{margin-top:.45rem;line-height:1.45;font-size:.98rem;flex:1}
+.scheda .apri{margin-top:.9rem;font-family:var(--sans);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--verderame)}
+.scheda:hover .apri{color:var(--ruggine)}
+.presto{opacity:.75}
+.presto .apri{color:var(--lieve)}
+
+.info{max-width:640px;margin:2.8rem auto 0;text-align:center;line-height:1.55;color:var(--lieve);font-size:.98rem}
+footer{text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:.06em;color:var(--lieve);padding:1.4rem 1rem 2.4rem}
+@media (max-width:560px){
+  .principale{flex-direction:column;text-align:center;padding:1.4rem}
+  .principale .ico{width:80px;height:80px}
+}
+@media (prefers-reduced-motion:reduce){.principale,.scheda{transition:none}}
+
+/* ricerca rapida */
+.rapida{max-width:640px;margin:1.4rem auto 0;position:relative}
+.rapida .lingue{display:flex;justify-content:center;gap:.4rem;margin-bottom:.6rem;font-family:var(--sans)}
+.rapida .lingue button{border:1px solid var(--ruggine);background:transparent;color:var(--ruggine-scura);padding:.35rem .8rem;
+  font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:inherit}
+.rapida .lingue button.attivo{background:var(--ruggine);color:var(--carta)}
+.rapida input{width:100%;font-family:var(--serif);font-size:1.25rem;padding:.65rem .8rem;border:1.5px solid var(--inchiostro);background:#FFFDF6;color:var(--inchiostro)}
+.rapida input:focus-visible,.rapida button:focus-visible{outline:3px solid var(--oro);outline-offset:2px}
+.rapida .stato{font-family:var(--sans);font-size:.7rem;color:var(--lieve);text-align:center;margin-top:.45rem;min-height:1em;letter-spacing:.04em}
+#ris{position:absolute;z-index:20;left:0;right:0;background:var(--carta);border:1px solid var(--tela-scura);box-shadow:0 8px 22px rgba(0,0,0,.12);max-height:20rem;overflow:auto}
+#ris[hidden]{display:none}
+#ris a{display:flex;justify-content:space-between;gap:1rem;padding:.5rem .8rem;border-bottom:1px solid var(--tela-scura);align-items:baseline}
+#ris a:hover,#ris a:focus{background:var(--tela)}
+#ris .k{font-weight:600}
+#ris .v{font-style:italic;color:var(--ruggine-scura);text-align:right;font-size:.95rem}
+#ris .piu{display:block;text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:.55rem;color:var(--verderame)}
+</style>
+</head>
+<body>
+<div class="stampa" aria-hidden="true">
+<svg viewBox="0 0 1200 34" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="34" fill="#8F432A"/>
+<g id="mod" fill="#EFE7D6" opacity=".85">
+<path d="M20 17 L30 7 L40 17 L30 27 Z" fill="none" stroke="#EFE7D6" stroke-width="1.6"/>
+<circle cx="30" cy="17" r="2.4"/>
+<path d="M55 24 q3-10 10-11 q-1-4 3-6 q1 3 4 3 q4 0 5 4 q6 1 6 7 q0 3-3 3 z"/>
+<circle cx="66" cy="9.5" r="1.1" fill="#8F432A"/>
+<path d="M95 17 L105 7 L115 17 L105 27 Z" fill="none" stroke="#EFE7D6" stroke-width="1.6"/>
+<circle cx="105" cy="17" r="2.4"/>
+</g>
+<g fill="#EFE7D6" opacity=".85">
+<use href="#mod" x="130"/><use href="#mod" x="260"/><use href="#mod" x="390"/><use href="#mod" x="520"/>
+<use href="#mod" x="650"/><use href="#mod" x="780"/><use href="#mod" x="910"/><use href="#mod" x="1040"/>
+</g>
+</svg>
+</div>
+
+<header>
+<h1>Dizionario Romagnolo</h1>
+<p class="motto">La lingua dei poeti tra Cesena e Santarcangelo, parola per parola</p>
+
+<div class="rapida" role="search">
+  <div class="lingue" role="group" aria-label="Lingua di ricerca">
+    <button type="button" id="l-it" class="attivo">Italiano</button>
+    <button type="button" id="l-en">English</button>
+  </div>
+  <input id="rq" type="search" placeholder="Cerca una parola… (es. «adesso», «burdèl»)" autocomplete="off" aria-label="Cerca una parola">
+  <div id="ris" hidden></div>
+  <div class="stato" id="rs">Cerca in italiano o in romagnolo</div>
+</div>
+</header>
+
+<main>
+<!-- PROGETTO CENTRALE -->
+<a class="principale" href="dizionario/">
+  <svg class="ico" viewBox="0 0 96 96" aria-hidden="true">
+    <circle cx="48" cy="48" r="46" fill="#8F432A"/>
+    <path d="M20 28 h24 q4 0 4 4 v38 q-3-3-8-3 h-20z M76 28 h-24 q-4 0-4 4 v38 q3-3 8-3 h20z" fill="#F7F2E6"/>
+    <path d="M26 38 h16 M26 46 h16 M26 54 h12 M54 38 h16 M54 46 h16 M54 54 h12" stroke="#8F432A" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M40 80 h16 M44 76 l-4 4 4 4 M52 76 l4 4 -4 4" fill="none" stroke="#EFE7D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <div>
+    <h2>Dizionario poetico italiano ⇄ romagnolo</h2>
+    <p>Oltre venticinquemila voci e locuzioni tratte dai poeti romagnoli, con citazioni d’esempio, area dialettale e fonte. Si cerca in entrambe le direzioni, anche dal telefono, e si può installare come app.</p>
+    <span class="vai">Apri il dizionario</span>
+  </div>
+</a>
+
+<p class="sezione">Altri strumenti</p>
+<div class="griglia">
+  <a class="scheda presto" href="rime/">
+    <svg class="ico" viewBox="0 0 56 56" aria-hidden="true">
+      <circle cx="28" cy="28" r="27" fill="#4A6653"/>
+      <path d="M13 20 h22 M13 28 h30 M13 36 h22" stroke="#F7F2E6" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="43" cy="20" r="3" fill="#B98A3D"/><circle cx="43" cy="36" r="3" fill="#B98A3D"/>
+    </svg>
+    <h3>Dizionario delle rime</h3>
+    <p>Dato un vocabolo romagnolo, trova le parole che rimano con esso, per scegliere la rima giusta nei versi dialettali.</p>
+    <span class="apri">In preparazione →</span>
+  </a>
+  <a class="scheda" href="inglese/">
+    <svg class="ico" viewBox="0 0 56 56" aria-hidden="true">
+      <circle cx="28" cy="28" r="27" fill="#4A6653"/>
+      <text x="28" y="35" text-anchor="middle" font-family="Georgia,serif" font-size="21" font-weight="700" fill="#F7F2E6">EN</text>
+      <path d="M12 43 h32 M38 39 l6 4 -6 4" stroke="#B98A3D" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h3>Dizionario inglese ⇄ romagnolo</h3>
+    <p>Le stesse voci con glosse in inglese: chi parla inglese trova la parola romagnola, e viceversa. <i>Per divertirsi (ci potrebbero essere strafalcioni).</i></p>
+    <span class="apri">Apri →</span>
+  </a>
+  <a class="scheda" href="berti/">
+    <svg class="ico" viewBox="0 0 56 56" aria-hidden="true">
+      <circle cx="28" cy="28" r="27" fill="#4A6653"/>
+      <rect x="15" y="12" width="26" height="32" rx="1.5" fill="#F7F2E6"/>
+      <path d="M15 12 h4 v32 h-4z" fill="#B98A3D"/>
+      <path d="M24 20 h13 M24 26 h13 M24 32 h9" stroke="#4A6653" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+    <h3>Il dizionario di Enrico Berti</h3>
+    <p>L’<i>Enciclopedia romagnola</i> di Enrico Berti, resa consultabile voce per voce con ricerca immediata.</p>
+    <span class="apri">Apri →</span>
+  </a>
+</div>
+
+<p class="info">Un progetto di Gianluca Scarpellini. I dizionari nascono dal lavoro sui testi dei poeti romagnoli e crescono con nuove fonti: segnalazioni e correzioni sono benvenute.</p>
+</main>
+
+<footer>&copy; 2026 Gianluca Scarpellini</footer>
+
+<script>
+/* ricerca rapida: carica il JSON del dizionario alla prima digitazione e rimanda all'app con #parola */
+(function(){
+  const SORG={it:{url:'dizionario/dizionario.json',app:'dizionario/',campo:'it',ph:'Cerca una parola… (es. «adesso», «burdèl»)',st:'Cerca in italiano o in romagnolo',vuoto:'Nessun risultato',piu:'Vedi tutti i risultati nel dizionario'},
+              en:{url:'inglese/dizionario_en.json',app:'inglese/',campo:'en',ph:'Search a word… (e.g. “moon”, “to rain”, “burdèl”)',st:'Search in English or in Romagnolo',vuoto:'No results',piu:'See all results in the dictionary'}};
+  let lingua='it', cache={}, idx={};
+  const q=document.getElementById('rq'), ris=document.getElementById('ris'), st=document.getElementById('rs');
+  const norm=s=>s.toLowerCase().replace(/[\u2019\u2018]/g,"'").normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  async function carica(){
+    if(idx[lingua]) return idx[lingua];
+    st.textContent = lingua==='it' ? 'Carico il dizionario…' : 'Loading the dictionary…';
+    try{
+      const r=await fetch(SORG[lingua].url); const d=await r.json();
+      const campo=SORG[lingua].campo, mappa=new Map();
+      const agg=(k,voce,riga)=>{ if(!k) return; if(!mappa.has(k)) mappa.set(k,{riga,forme:[]}); const o=mappa.get(k); if(!o.forme.includes(voce)) o.forme.push(voce); };
+      for(const e of d.entries){
+        agg(norm(e.d), e.d, {k:e.d, v:(e[campo]||[]).slice(0,3).join(', ')});
+        for(const g of (e[campo]||[])){ const k=norm(g.replace(/\s*\([^)]*\)/g,'')); agg(k,e.d,{k:g.replace(/\s*\([^)]*\)/g,''),v:''}); const a=k.replace(/^(to|the|a|an) +/,''); if(a!==k) agg(a,e.d,{k:g.replace(/\s*\([^)]*\)/g,''),v:''}); }
+      }
+      idx[lingua]=[...mappa.entries()];
+      st.textContent=SORG[lingua].st;
+      return idx[lingua];
+    }catch(e){
+      st.textContent = lingua==='it' ? 'Ricerca rapida non disponibile: apri direttamente il dizionario.' : 'Quick search unavailable: open the dictionary directly.';
+      return [];
+    }
+  }
+  async function cerca(){
+    const t=norm(q.value);
+    if(!t){ ris.hidden=true; return; }
+    const lista=await carica(); const S=SORG[lingua];
+    const esatti=[], inizio=[];
+    for(const [k,o] of lista){ if(k===t) esatti.push(o); else if(k.startsWith(t)) inizio.push(o); if(esatti.length+inizio.length>200) break; }
+    const tutti=[...esatti,...inizio];
+    const vedi=tutti.slice(0,8).map(o=>{
+      const ver=o.forme.slice(0,3).join(', ');
+      const isDial=o.riga.v!=='';
+      return '<a href="'+S.app+'#'+encodeURIComponent(isDial?o.riga.k:o.riga.k)+'"><span class="k">'+esc(o.riga.k)+'</span><span class="v">'+esc(isDial?o.riga.v:ver)+'</span></a>';
+    });
+    ris.innerHTML = vedi.length ? vedi.join('')+'<a class="piu" href="'+S.app+'#'+encodeURIComponent(q.value.trim())+'">'+S.piu+' →</a>' : '<span class="piu" style="color:var(--lieve)">'+S.vuoto+'</span>';
+    ris.hidden=false;
+  }
+  let tm; q.addEventListener('input',()=>{ clearTimeout(tm); tm=setTimeout(cerca,120); });
+  q.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const a=ris.querySelector('a'); if(a) location.href=a.href; } if(e.key==='Escape') ris.hidden=true; });
+  document.addEventListener('click',e=>{ if(!e.target.closest('.rapida')) ris.hidden=true; });
+  for(const l of ['it','en']) document.getElementById('l-'+l).addEventListener('click',()=>{
+    lingua=l; document.getElementById('l-it').classList.toggle('attivo',l==='it'); document.getElementById('l-en').classList.toggle('attivo',l==='en');
+    q.placeholder=SORG[l].ph; st.textContent=SORG[l].st; cerca();
+  });
+})();
+</script>
+</body>
+</html>
