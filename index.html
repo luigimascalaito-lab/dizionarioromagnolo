@@ -76,6 +76,7 @@ footer{text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:
 #ris a:hover,#ris a:focus{background:var(--tela)}
 #ris .k{font-weight:600}
 #ris .v{font-style:italic;color:var(--ruggine-scura);text-align:right;font-size:.95rem}
+#ris .gruppo{display:block;font-family:var(--sans);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--verderame);background:var(--tela-scura);padding:.3rem .8rem}
 #ris .piu{display:block;text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:.55rem;color:var(--verderame)}
 </style>
 </head>
@@ -103,13 +104,9 @@ footer{text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:
 <p class="motto">La lingua dei poeti tra Cesena e Santarcangelo, parola per parola</p>
 
 <div class="rapida" role="search">
-  <div class="lingue" role="group" aria-label="Lingua di ricerca">
-    <button type="button" id="l-it" class="attivo">Italiano</button>
-    <button type="button" id="l-en">English</button>
-  </div>
-  <input id="rq" type="search" placeholder="Cerca una parola… (es. «adesso», «burdèl»)" autocomplete="off" aria-label="Cerca una parola">
+  <input id="rq" type="search" placeholder="Cerca una parola in italiano, inglese o romagnolo…" autocomplete="off" aria-label="Cerca una parola">
   <div id="ris" hidden></div>
-  <div class="stato" id="rs">Cerca in italiano o in romagnolo</div>
+  <div class="stato" id="rs">Scrivi in italiano, in inglese o in romagnolo: cerco in entrambi i dizionari</div>
 </div>
 </header>
 
@@ -170,55 +167,62 @@ footer{text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:
 <footer>&copy; 2026 Gianluca Scarpellini</footer>
 
 <script>
-/* ricerca rapida: carica il JSON del dizionario alla prima digitazione e rimanda all'app con #parola */
+/* ricerca rapida: interroga insieme il dizionario italiano⇄romagnolo e quello inglese⇄romagnolo;
+   i file JSON si caricano alla prima digitazione; ogni risultato rimanda all'app con #parola */
 (function(){
-  const SORG={it:{url:'dizionario/dizionario.json',app:'dizionario/',campo:'it',ph:'Cerca una parola… (es. «adesso», «burdèl»)',st:'Cerca in italiano o in romagnolo',vuoto:'Nessun risultato',piu:'Vedi tutti i risultati nel dizionario'},
-              en:{url:'inglese/dizionario_en.json',app:'inglese/',campo:'en',ph:'Search a word… (e.g. “moon”, “to rain”, “burdèl”)',st:'Search in English or in Romagnolo',vuoto:'No results',piu:'See all results in the dictionary'}};
-  let lingua='it', cache={}, idx={};
+  const SORG=[
+    {id:'it',titolo:'Italiano ⇄ romagnolo',url:'dizionario/dizionario.json',app:'dizionario/',campo:'it',piu:'Vedi tutti i risultati nel dizionario'},
+    {id:'en',titolo:'English ⇄ romagnolo',url:'inglese/dizionario_en.json',app:'inglese/',campo:'en',piu:'See all results in the dictionary'}
+  ];
+  const idx={}; let caricati=0, falliti=0;
   const q=document.getElementById('rq'), ris=document.getElementById('ris'), st=document.getElementById('rs');
   const norm=s=>s.toLowerCase().replace(/[\u2019\u2018]/g,"'").normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
   const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  async function carica(){
-    if(idx[lingua]) return idx[lingua];
-    st.textContent = lingua==='it' ? 'Carico il dizionario…' : 'Loading the dictionary…';
-    try{
-      const r=await fetch(SORG[lingua].url); const d=await r.json();
-      const campo=SORG[lingua].campo, mappa=new Map();
-      const agg=(k,voce,riga)=>{ if(!k) return; if(!mappa.has(k)) mappa.set(k,{riga,forme:[]}); const o=mappa.get(k); if(!o.forme.includes(voce)) o.forme.push(voce); };
-      for(const e of d.entries){
-        agg(norm(e.d), e.d, {k:e.d, v:(e[campo]||[]).slice(0,3).join(', ')});
-        for(const g of (e[campo]||[])){ const k=norm(g.replace(/\s*\([^)]*\)/g,'')); agg(k,e.d,{k:g.replace(/\s*\([^)]*\)/g,''),v:''}); const a=k.replace(/^(to|the|a|an) +/,''); if(a!==k) agg(a,e.d,{k:g.replace(/\s*\([^)]*\)/g,''),v:''}); }
-      }
-      idx[lingua]=[...mappa.entries()];
-      st.textContent=SORG[lingua].st;
-      return idx[lingua];
-    }catch(e){
-      st.textContent = lingua==='it' ? 'Ricerca rapida non disponibile: apri direttamente il dizionario.' : 'Quick search unavailable: open the dictionary directly.';
-      return [];
+  const senzaPar=g=>g.replace(/\s*\([^)]*\)/g,'');
+  let avviato=false;
+  function carica(){
+    if(avviato) return; avviato=true;
+    st.textContent='Carico i dizionari…';
+    for(const S of SORG){
+      fetch(S.url).then(r=>r.json()).then(d=>{
+        const mappa=new Map();
+        const agg=(k,voce,riga)=>{ if(!k) return; if(!mappa.has(k)) mappa.set(k,{riga,forme:[]}); const o=mappa.get(k); if(!o.forme.includes(voce)) o.forme.push(voce); };
+        for(const e of d.entries){
+          agg(norm(e.d), e.d, {k:e.d, v:(e[S.campo]||[]).slice(0,3).join(', ')});
+          for(const g of (e[S.campo]||[])){ const p=senzaPar(g), k=norm(p); agg(k,e.d,{k:p,v:''}); const a=k.replace(/^(to|the|a|an) +/,''); if(a!==k) agg(a,e.d,{k:p,v:''}); }
+        }
+        idx[S.id]=[...mappa.entries()]; caricati++; fine();
+      }).catch(()=>{ idx[S.id]=[]; falliti++; fine(); });
     }
   }
-  async function cerca(){
+  function fine(){
+    if(caricati+falliti<SORG.length) return;
+    st.textContent = falliti===SORG.length ? 'Ricerca rapida non disponibile: apri direttamente un dizionario.' : 'Scrivi in italiano, in inglese o in romagnolo: cerco in entrambi i dizionari';
+    cerca();
+  }
+  function cerca(){
     const t=norm(q.value);
     if(!t){ ris.hidden=true; return; }
-    const lista=await carica(); const S=SORG[lingua];
-    const esatti=[], inizio=[];
-    for(const [k,o] of lista){ if(k===t) esatti.push(o); else if(k.startsWith(t)) inizio.push(o); if(esatti.length+inizio.length>200) break; }
-    const tutti=[...esatti,...inizio];
-    const vedi=tutti.slice(0,8).map(o=>{
-      const ver=o.forme.slice(0,3).join(', ');
-      const isDial=o.riga.v!=='';
-      return '<a href="'+S.app+'#'+encodeURIComponent(isDial?o.riga.k:o.riga.k)+'"><span class="k">'+esc(o.riga.k)+'</span><span class="v">'+esc(isDial?o.riga.v:ver)+'</span></a>';
-    });
-    ris.innerHTML = vedi.length ? vedi.join('')+'<a class="piu" href="'+S.app+'#'+encodeURIComponent(q.value.trim())+'">'+S.piu+' →</a>' : '<span class="piu" style="color:var(--lieve)">'+S.vuoto+'</span>';
+    if(caricati+falliti<SORG.length) return;
+    let html='', tot=0;
+    for(const S of SORG){
+      const esatti=[], inizio=[];
+      for(const [k,o] of (idx[S.id]||[])){ if(k===t) esatti.push(o); else if(k.startsWith(t)) inizio.push(o); if(esatti.length+inizio.length>200) break; }
+      const righe=[...esatti,...inizio].slice(0,5);
+      if(!righe.length) continue;
+      tot+=righe.length;
+      html+='<span class="gruppo">'+S.titolo+'</span>'+righe.map(o=>{
+        const isDial=o.riga.v!==''; const ver=o.forme.slice(0,3).join(', ');
+        return '<a href="'+S.app+'#'+encodeURIComponent(o.riga.k)+'"><span class="k">'+esc(o.riga.k)+'</span><span class="v">'+esc(isDial?o.riga.v:ver)+'</span></a>';
+      }).join('')+'<a class="piu" href="'+S.app+'#'+encodeURIComponent(q.value.trim())+'">'+S.piu+' →</a>';
+    }
+    ris.innerHTML = tot ? html : '<span class="piu" style="color:var(--lieve)">Nessun risultato</span>';
     ris.hidden=false;
   }
-  let tm; q.addEventListener('input',()=>{ clearTimeout(tm); tm=setTimeout(cerca,120); });
-  q.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const a=ris.querySelector('a'); if(a) location.href=a.href; } if(e.key==='Escape') ris.hidden=true; });
+  let tm; q.addEventListener('input',()=>{ carica(); clearTimeout(tm); tm=setTimeout(cerca,120); });
+  q.addEventListener('focus',carica);
+  q.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const a=ris.querySelector('a:not(.piu)')||ris.querySelector('a'); if(a) location.href=a.href; } if(e.key==='Escape') ris.hidden=true; });
   document.addEventListener('click',e=>{ if(!e.target.closest('.rapida')) ris.hidden=true; });
-  for(const l of ['it','en']) document.getElementById('l-'+l).addEventListener('click',()=>{
-    lingua=l; document.getElementById('l-it').classList.toggle('attivo',l==='it'); document.getElementById('l-en').classList.toggle('attivo',l==='en');
-    q.placeholder=SORG[l].ph; st.textContent=SORG[l].st; cerca();
-  });
 })();
 </script>
 </body>
