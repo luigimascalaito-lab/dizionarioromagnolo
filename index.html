@@ -104,9 +104,9 @@ footer{text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:
 <p class="motto">La lingua dei poeti tra Cesena e Santarcangelo, parola per parola</p>
 
 <div class="rapida" role="search">
-  <input id="rq" type="search" placeholder="Cerca una parola in italiano, inglese o romagnolo…" autocomplete="off" aria-label="Cerca una parola">
+  <input id="rq" type="search" placeholder="Cerca una parola in italiano o in romagnolo…" autocomplete="off" aria-label="Cerca una parola">
   <div id="ris" hidden></div>
-  <div class="stato" id="rs">Scrivi in italiano, in inglese o in romagnolo: cerco in entrambi i dizionari</div>
+  <div class="stato" id="rs">Scrivi in italiano o in romagnolo</div>
 </div>
 </header>
 
@@ -168,12 +168,11 @@ footer{text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:
 <footer>&copy; 2026 Gianluca Scarpellini</footer>
 
 <script>
-/* ricerca rapida: interroga insieme il dizionario italiano⇄romagnolo e quello inglese⇄romagnolo;
-   i file JSON si caricano alla prima digitazione; ogni risultato rimanda all'app con #parola */
+/* ricerca rapida: interroga il dizionario italiano⇄romagnolo;
+   il file JSON si carica alla prima digitazione; ogni risultato rimanda all'app con #parola */
 (function(){
   const SORG=[
-    {id:'it',titolo:'Italiano ⇄ romagnolo',url:'dizionario/dizionario.json',app:'dizionario/',campo:'it',piu:'Vedi tutti i risultati nel dizionario'},
-    {id:'en',titolo:'English ⇄ romagnolo',url:'inglese/dizionario_en.json',app:'inglese/',campo:'en',piu:'See all results in the dictionary'}
+    {id:'it',titolo:'Italiano ⇄ romagnolo',url:'dizionario/dizionario.json',app:'dizionario/',campo:'it',piu:'Vedi tutti i risultati nel dizionario'}
   ];
   const idx={}; let caricati=0, falliti=0;
   const q=document.getElementById('rq'), ris=document.getElementById('ris'), st=document.getElementById('rs');
@@ -183,7 +182,7 @@ footer{text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:
   let avviato=false;
   function carica(){
     if(avviato) return; avviato=true;
-    st.textContent='Carico i dizionari…';
+    st.textContent='Carico il dizionario…';
     for(const S of SORG){
       fetch(S.url).then(r=>r.json()).then(d=>{
         const mappa=new Map();
@@ -198,7 +197,7 @@ footer{text-align:center;font-family:var(--sans);font-size:.7rem;letter-spacing:
   }
   function fine(){
     if(caricati+falliti<SORG.length) return;
-    st.textContent = falliti===SORG.length ? 'Ricerca rapida non disponibile: apri direttamente un dizionario.' : 'Scrivi in italiano, in inglese o in romagnolo: cerco in entrambi i dizionari';
+    st.textContent = falliti===SORG.length ? 'Ricerca rapida non disponibile: apri direttamente un dizionario.' : 'Scrivi in italiano o in romagnolo';
     cerca();
   }
   function cerca(){

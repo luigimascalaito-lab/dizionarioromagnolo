@@ -14,8 +14,11 @@ Struttura del repository (GitHub Pages):
 2. Settings → Pages: sorgente «Deploy from a branch», ramo `main`, cartella `/ (root)`.
 3. Il sito sarà su `https://<utente>.github.io/<repository>/` (oppure su `https://<utente>.github.io/` se il repository si chiama `<utente>.github.io`).
 
-## Quando acquisterai il dominio
-Aggiungi un file `CNAME` con il solo nome del dominio, imposta il DNS (quattro record A: 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153; un CNAME `www` → `<utente>.github.io`) e attiva «Enforce HTTPS». Non serve modificare nessuna pagina.
+## Dominio personalizzato
+Il file `CNAME` contiene `www.dizionarioromagnolo.it`: con quello e l'impostazione «Custom domain» di Settings → Pages, GitHub reindirizza (301) automaticamente l'indirizzo `github.io` al dominio. DNS presso il registrar:
+- `www` → record CNAME verso `<utente>.github.io`
+- dominio senza www (apex) → quattro record A: 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153 (GitHub poi reindirizza `dizionarioromagnolo.it` a `www.dizionarioromagnolo.it`)
+Poi attiva «Enforce HTTPS». Non serve modificare nessuna pagina.
 
 Aggiornamenti: a ogni nuova edizione di un’app aumenta `VERSIONE` nel suo `sw.js`.
 Collegamenti diretti: `dizionario/#adesso`, `dizionario/#rom/burdèl`, `inglese/#en/to%20rain`.
